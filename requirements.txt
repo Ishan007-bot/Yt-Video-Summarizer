@@ -1,10 +1,10 @@
-farm-haystack
+farm-haystack[audio]
 streamlit
 streamlit_chat
 torch
 sentence_transformers
-pytube
+pytubefix
 faiss_cpu
 ctransformers
-git+https://github.com/openai/whisper.git 
+openai-whisper
 llama-cpp-python

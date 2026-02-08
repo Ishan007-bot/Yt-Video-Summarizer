@@ -1,10 +1,18 @@
 import streamlit as st
-from pytube import YouTube
+from pytubefix import YouTube
 from haystack.nodes import PromptNode, PromptModel
 from haystack.nodes.audio import WhisperTranscriber
 from haystack.pipelines import Pipeline
 from model_add import LlamaCPPInvocationLayer
 import time
+import os
+
+# Add ffmpeg to PATH for Whisper
+try:
+    import static_ffmpeg
+    static_ffmpeg.add_paths()
+except ImportError:
+    pass
 
 st.set_page_config(
     layout="wide"
@@ -58,7 +66,7 @@ def main():
         file_path = download_video(youtube_url)
 
         # Initialize model
-        full_path = "llama-2-7b-32k-instruct.Q4_K_S.gguf"
+        full_path = os.environ.get("GGUF_MODEL_PATH", "llama-2-7b-32k-instruct.Q4_K_S.gguf")
         model = initialize_model(full_path)
         prompt_node = prompt_node = initialize_prompt_node(model)
         # Transcribe audio

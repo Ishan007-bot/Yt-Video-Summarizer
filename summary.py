@@ -1,4 +1,4 @@
-from pytube import YouTube
+from pytubefix import YouTube
 from haystack.nodes import PromptNode, PromptModel
 from haystack.nodes.audio import WhisperTranscriber
 from haystack.pipelines import Pipeline
