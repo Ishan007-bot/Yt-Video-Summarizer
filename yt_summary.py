@@ -22,8 +22,11 @@ st.set_page_config(
     layout="wide"
 )
 
-# Download to D: drive to avoid "No space left" on C:
-DOWNLOAD_DIR = os.environ.get("YT_DOWNLOAD_DIR", r"D:\yt_downloads")
+import tempfile
+
+# Download directory -- uses /tmp by default (works on Linux & HF Spaces);
+# override with YT_DOWNLOAD_DIR env var for local Windows usage.
+DOWNLOAD_DIR = os.environ.get("YT_DOWNLOAD_DIR", os.path.join(tempfile.gettempdir(), "yt_downloads"))
 
 def download_video(url):
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)

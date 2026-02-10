@@ -1,40 +1,71 @@
-# YouTube Video Summarization App
-YouTube Video Summarization App built using open source LLM and Framework like Llama 2, Haystack, Whisper, and Streamlit. This app smoothly runs on CPU as Llama 2 model is in GGUF format loaded through Llama.cpp.
+# YouTube Video Summarizer
 
-## 📝 Description:
-YouTube Video Summarization App, is a powerful and customizable tool at your disposal, capable of automatically summarizing YouTube videos. 
+A Streamlit web app that takes a YouTube video URL, transcribes its audio using **OpenAI Whisper**, and generates a concise summary using a **HuggingFace Transformers** summarization model. Runs entirely on CPU -- no GPU or API keys required.
 
-## 💫Requirements:
+## How It Works
 
-- **🔍 Haystack: Your AI-Powered Search Engine**
-Haystack is a versatile framework that allows you to harness the power of Generative AI to efficiently search, extract, and summarize information from vast amounts of text data. 
+1. **Download** -- the audio track of a YouTube video is downloaded via `pytubefix`.
+2. **Transcribe** -- OpenAI Whisper (through Haystack's `WhisperTranscriber`) converts speech to text.
+3. **Summarize** -- a HuggingFace summarization pipeline (`sshleifer/distilbart-cnn-12-6`) condenses the transcript into a short summary.
+4. **Display** -- the video and its summary are shown side-by-side in a Streamlit UI.
 
-- **🤖 Llama 2: The AI Brain**
-Meet Llama 2, a massive language model that will assist you in understanding and summarizing the content of YouTube videos. You'll learn how to leverage Llama 2's language capabilities to extract key insights from video transcripts. That too 32K context length model in the GGUF format.
+## Tech Stack
 
-- **🗣️ Whisper: Transforming Speech to Text**
-Whisper, a state-of-the-art automatic speech recognition (ASR) model, will be your go-to tool for transcribing spoken content from your YouTube videos. I'll show you how to integrate Whisper from Haystack inbuilt class seamlessly into your application, enabling it to work with both spoken and textual data.
+| Component | Library |
+|-----------|---------|
+| Web UI | [Streamlit](https://streamlit.io/) |
+| NLP Pipeline | [Haystack](https://haystack.deepset.ai/) (v1.x) |
+| Speech-to-Text | [OpenAI Whisper](https://github.com/openai/whisper) |
+| Summarization | [HuggingFace Transformers](https://huggingface.co/sshleifer/distilbart-cnn-12-6) |
+| Video Download | [pytubefix](https://github.com/JuanBindez/pytubefix) |
 
-- **🚀 Streamlit: The User-Friendly Interface**
-Streamlit is the secret sauce that ties it all together. With its user-friendly interface design, you can effortlessly create a visually appealing front end for your YouTube Video Summarization App. We'll guide you through building an intuitive interface that allows users to interact with your app easily.
+## Quick Start
 
-## 🌟Implementation Guide:
-[Demo ▶️](https://www.youtube.com/watch?v=K9mDAb2Lz6Y)
+```bash
+# Clone the repo
+git clone https://github.com/Ishan007-bot/Yt-Video-Summarizer.git
+cd Yt-Video-Summarizer
 
-## 🔗Other Links:
-- Haystack: https://haystack.deepset.ai/
-- Llama 2 32K Model: https://huggingface.co/togethercomputer/LLaMA-2-7B-32K
-- Llama 2 32K GGUF Model: 32K-Instruct-GGUF🦌
+# Create a virtual environment and install dependencies
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS / Linux
 
+pip install -r requirements.txt
 
- ---
-## ©️ License 🪪 
+# Run the app
+streamlit run yt_summary.py
+```
+
+Open **http://localhost:8501**, paste a YouTube URL, and click **Submit**.
+
+## Configuration (Environment Variables)
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WHISPER_MODEL` | `base` | Whisper model size (`tiny`, `base`, `small`, `medium`) |
+| `SUMMARY_MODEL` | `sshleifer/distilbart-cnn-12-6` | HuggingFace summarization model |
+| `YT_DOWNLOAD_DIR` | `/tmp/yt_downloads` | Directory for downloaded audio files |
+
+## Project Structure
+
+```
+.
+├── yt_summary.py      # Main Streamlit app
+├── model_add.py       # Custom Haystack invocation layer (HF summarization)
+├── summary.py         # Standalone CLI summarization script
+├── requirements.txt   # Python dependencies
+├── .streamlit/        # Streamlit config (headless, no email prompt)
+├── LICENSE
+└── README.md
+```
+
+---
+
+## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-#### **If you like this LLM Project do drop ⭐ to this repo**
-#### Follow me on [![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/gurpreetkaurjethra/) &nbsp; [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GURPREETKAURJETHRA/)
-
----
+**If you like this project, drop a star to the repo!**

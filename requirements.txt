@@ -5,6 +5,6 @@ torch
 sentence_transformers
 pytubefix
 faiss_cpu
-ctransformers
+transformers
 openai-whisper
-llama-cpp-python
+static-ffmpeg
