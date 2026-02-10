@@ -69,3 +69,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 
 **If you like this project, drop a star to the repo!**
+
+### Connect with me
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ishanganguly01/) &nbsp; [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ishan007-bot)
