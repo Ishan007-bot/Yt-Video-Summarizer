@@ -37,7 +37,7 @@ pip install -r requirements.txt
 streamlit run yt_summary.py
 ```
 
-Open **http://localhost:8501**, paste a YouTube URL, and click **Submit**.
+Check out the app by opening **https://ishanbot-yt-video-summarizer.hf.space**, paste a YouTube URL, and click **Submit**.
 
 ## Configuration (Environment Variables)
 
