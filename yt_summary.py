@@ -1,11 +1,15 @@
+import os
+import time
+
+# Disable Haystack telemetry before importing (avoids PermissionError on .haystack dir)
+os.environ["HAYSTACK_TELEMETRY_ENABLED"] = "False"
+
 import streamlit as st
 from pytubefix import YouTube
 from haystack.nodes import PromptNode, PromptModel
 from haystack.nodes.audio import WhisperTranscriber
 from haystack.pipelines import Pipeline
 from model_add import LlamaCPPInvocationLayer
-import time
-import os
 
 # Add ffmpeg to PATH for Whisper
 try:
@@ -18,10 +22,14 @@ st.set_page_config(
     layout="wide"
 )
 
+# Download to D: drive to avoid "No space left" on C:
+DOWNLOAD_DIR = os.environ.get("YT_DOWNLOAD_DIR", r"D:\yt_downloads")
+
 def download_video(url):
+    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
     yt = YouTube(url)
     video = yt.streams.filter(abr='160kbps').last()
-    return video.download()
+    return video.download(output_path=DOWNLOAD_DIR)
 
 def initialize_model(full_path):
     return PromptModel(
@@ -36,7 +44,9 @@ def initialize_prompt_node(model):
     return PromptNode(model_name_or_path=model, default_prompt_template=summary_prompt, use_gpu=False)
 
 def transcribe_audio(file_path, prompt_node):
-    whisper = WhisperTranscriber()
+    # "base" = faster; set env WHISPER_MODEL=tiny for max speed, or small/medium for better accuracy
+    whisper_model = os.environ.get("WHISPER_MODEL", "base")
+    whisper = WhisperTranscriber(model_name_or_path=whisper_model)
     pipeline = Pipeline()
     pipeline.add_node(component=whisper, name="whisper", inputs=["File"])
     pipeline.add_node(component=prompt_node, name="prompt", inputs=["whisper"])
@@ -61,33 +71,37 @@ def main():
 
     # Submit button
     if st.button("Submit") and youtube_url:
-        start_time = time.time()  # Start the timer
-        # Download video
-        file_path = download_video(youtube_url)
+        start_time = time.time()
+        try:
+            with st.spinner("Downloading video..."):
+                file_path = download_video(youtube_url)
+            st.success("Downloaded.")
 
-        # Initialize model
-        full_path = os.environ.get("GGUF_MODEL_PATH", "llama-2-7b-32k-instruct.Q4_K_S.gguf")
-        model = initialize_model(full_path)
-        prompt_node = prompt_node = initialize_prompt_node(model)
-        # Transcribe audio
-        output = transcribe_audio(file_path, prompt_node)
+            with st.spinner("Loading summarization model (first time may take a minute)..."):
+                model_path = os.environ.get("SUMMARY_MODEL", "sshleifer/distilbart-cnn-12-6")
+                model = initialize_model(model_path)
+                prompt_node = initialize_prompt_node(model)
+            st.success("Model ready.")
 
-        end_time = time.time()  # End the timer
-        elapsed_time = end_time - start_time
+            with st.spinner("Transcribing audio with Whisper (1–5 min depending on video length)..."):
+                output = transcribe_audio(file_path, prompt_node)
+            st.success("Done transcribing.")
 
-        # Display layout with 2 columns
-        col1, col2 = st.columns([1,1])
+            end_time = time.time()
+            elapsed_time = end_time - start_time
 
-        # Column 1: Video view
-        with col1:
-            st.video(youtube_url)
-
-        # Column 2: Summary View
-        with col2:
-            st.header("Summarization of YouTube Video")
-            st.write(output)
-            st.success(output["results"][0].split("\n\n[INST]")[0])
-            st.write(f"Time taken: {elapsed_time:.2f} seconds")
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.video(youtube_url)
+            with col2:
+                st.header("Summarization of YouTube Video")
+                summary_text = output["results"][0] if output.get("results") else str(output)
+                st.success(summary_text)
+                st.write(f"Time taken: {elapsed_time:.2f} seconds")
+        except Exception as e:
+            st.error(f"Something went wrong: {e}")
+            import traceback
+            st.code(traceback.format_exc())
 
 if __name__ == "__main__":
     main()
